@@ -22,7 +22,6 @@ jobs:
     - name: Set Env Variables
       id: set_repo_variables
       run: |
-           cat env/.env >>${GITHUB_ENV}
            cat env/dev/.env >>${GITHUB_ENV}
            
     - name: Print all env vars
