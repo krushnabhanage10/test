@@ -50,13 +50,11 @@ jobs:
     #     cluster_name: ${{ secrets.GKE_CLUSTER }}
     #     location: ${{ secrets.GKE_ZONE }}
 
-    - name: Replace placeholders in manifest
+    - name: Replace placeholders in manifest in-place
       run: |
-        mkdir rendered
-        envsubst < k8s/deployment.yaml > rendered/deployment.yaml
-        cat rendered/deployment.yaml
+        envsubst < k8s/deployment.yaml > k8s/deployment.yaml.tmp
+        mv k8s/deployment.yaml.tmp k8s/deployment.yaml
 
     - name: Apply manifest
       run: |
-        kubectl apply -f rendered/deployment.yaml
-        kubectl rollout status deployment/your-deployment-name
+        cat k8s/deployment.yaml
