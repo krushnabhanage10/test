@@ -22,17 +22,14 @@ jobs:
     - name: Set Env Variables
       id: set_repo_variables
       run: |
+           cat env/.env >>${GITHUB_ENV}
            cat env/dev/.env >>${GITHUB_ENV}
+           echo ${{ env.APP__NAME }}
 
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v2
       with:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
-    
-    - name: Build Docker image
-      run: |
-           echo ${{ env.APP__NAME }}
-           docker build -t gcr.io/${{ secrets.GCP_PROJECT }}/your-image-name:${{ github.sha }} .
 
           
     - name: Configure Docker to use GCR
