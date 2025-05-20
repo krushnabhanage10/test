@@ -28,7 +28,13 @@ jobs:
       uses: google-github-actions/auth@v2
       with:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
+    
+    - name: Build Docker image
+      run: |
+           echo ${{ env.APP__NAME }}
+           docker build -t gcr.io/${{ secrets.GCP_PROJECT }}/your-image-name:${{ github.sha }} .
 
+          
     - name: Configure Docker to use GCR
       run: gcloud auth configure-docker
 
