@@ -1,0 +1,55 @@
+name: Build and Deploy to Kubernetes
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set Env Variables
+      id: set_repo_variables
+      run: |
+           cat env/dev/.env >>${{GITHUB_ENV}}
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Configure Docker to use GCR
+      run: gcloud auth configure-docker
+
+    - name: Build Docker image
+      run: docker build -t gcr.io/${{ secrets.GCP_PROJECT }}/your-image-name:${{ github.sha }} .
+
+    - name: Push image to GCR
+      run: docker push gcr.io/${{ secrets.GCP_PROJECT }}/your-image-name:${{ github.sha }}
+
+    - name: Get GKE credentials
+      uses: google-github-actions/get-gke-credentials@v2
+      with:
+        cluster_name: ${{ secrets.GKE_CLUSTER }}
+        location: ${{ secrets.GKE_ZONE }}
+
+    - name: Replace placeholders in manifest
+      run: |
+        mkdir rendered
+        envsubst < k8s/deployment.yaml > rendered/deployment.yaml
+
+    - name: Apply manifest
+      run: |
+        kubectl apply -f rendered/deployment.yaml
+        kubectl rollout status deployment/your-deployment-name
