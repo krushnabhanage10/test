@@ -22,7 +22,7 @@ jobs:
     - name: Set Env Variables
       id: set_repo_variables
       run: |
-           cat env/dev/.env >>${{GITHUB_ENV}}
+           cat env/dev/.env >>${GITHUB_ENV}
 
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v2
