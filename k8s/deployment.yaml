@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: your-deployment-name
+spec:
+  replicas: ${REPLICAS}
+  selector:
+    matchLabels:
+      app: your-app
+  template:
+    metadata:
+      labels:
+        app: your-app
+    spec:
+      containers:
+        - name: your-container-name
+          image: gcr.io/${GCP_PROJECT}/your-image-name:${GITHUB_SHA}
+          env:
+            - name: ENV
+              value: "${ENV}"
+            - name: DOMAIN
+              value: "${DOMAIN}"
+          ports:
+            - containerPort: 80
